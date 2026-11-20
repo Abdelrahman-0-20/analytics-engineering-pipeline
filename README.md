@@ -31,9 +31,19 @@ pipeline_log        every run recorded (rows in, rows out, rejected per rule)
 python3 -m venv .venv && source .venv/bin/activate
 pip install -r requirements.txt
 
-python -m src.pipeline   # fetch → bronze → silver → gold + sample queries
-python -m pytest -q      # data quality gates must pass
+python -m src.pipeline      # fetch → bronze → silver → gold + sample queries
+python -m src.export_gold   # export Gold tables to dashboard/data/*.csv
+python -m pytest -q         # data quality gates must pass
+streamlit run app.py        # dashboard on the Gold layer
 ```
+
+## Dashboard
+
+`app.py` is a Streamlit app serving the **Gold layer only** (never Bronze/Silver).
+CI exports `dashboard/data/*.csv` after every pipeline run and commits them back
+(`[skip ci]`), so the deployed app always shows fresh numbers without needing
+database access. Deploy free on [Streamlit Community Cloud](https://share.streamlit.io)
+by connecting this repo — it runs `streamlit run app.py` automatically.
 
 Rerun either command any time — ingestion is idempotent (one ingest log entry per
 source file) and Silver/Gold use `CREATE OR REPLACE`, so **running twice produces
