@@ -1,9 +1,18 @@
 # Trip Analytics Engineering Pipeline
 
+[![ETL pipeline](https://github.com/Abdelrahman-0-20/analytics-engineering-pipeline/actions/workflows/pipeline.yml/badge.svg)](https://github.com/Abdelrahman-0-20/analytics-engineering-pipeline/actions/workflows/pipeline.yml)
+
+Project #1 of a [data engineering portfolio](https://github.com/Abdelrahman-0-20/api-ingestion-pipeline)
+(companion: [API ingestion pipeline](https://github.com/Abdelrahman-0-20/api-ingestion-pipeline) — live-source ingestion).
+
 A short, resume-focused ETL project: **public NYC TLC taxi data** (same schema family as
 Uber fares — pickup/dropoff times, fares, tips, distances, NYC taxi zones) → cleaned
 Bronze/Silver/Gold layers in **DuckDB** → proven by **pytest** → scheduled by
 **GitHub Actions**. No API keys, no cloud accounts, no services to run.
+
+**Pipeline at a glance:** 2.96M raw rows ingested · 235,582 rejected by quality
+gates (7.9%) · 31 days of revenue · 6,689 zone-day aggregates · rerun-safe
+(proven idempotent: second run changes nothing).
 
 ## Architecture
 
@@ -45,9 +54,9 @@ CI exports `dashboard/data/*.csv` after every pipeline run and commits them back
 database access. Deploy free on [Streamlit Community Cloud](https://share.streamlit.io)
 by connecting this repo — it runs `streamlit run app.py` automatically.
 
-Rerun either command any time — ingestion is idempotent (one ingest log entry per
-source file) and Silver/Gold use `CREATE OR REPLACE`, so **running twice produces
-the same warehouse, never duplicates**.
+Re-running is safe: ingestion is logged once per source file and Silver/Gold use
+`CREATE OR REPLACE`, so **running twice produces the same warehouse, never
+duplicates** — verified by tests.
 
 ## Design decisions (interview talking points)
 
@@ -66,8 +75,8 @@ the same warehouse, never duplicates**.
 > transformations, pytest data-quality gates, idempotent ingestion, and daily scheduled
 > runs via GitHub Actions.
 
-## Stage B roadmap (later, not now)
+## Ideas for later
 
-- Streamlit dashboard reading the Gold layer
 - dbt for the transformation layer
 - H3/zone spatial analysis with GeoPandas
+- Alerting when a quality gate fails (email/Slack webhook)
