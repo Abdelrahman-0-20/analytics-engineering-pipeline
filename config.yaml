@@ -1,0 +1,41 @@
+# Pipeline configuration — paths and thresholds live here, never in code.
+source:
+  trips:
+    url: "https://d37ci6vzurychx.cloudfront.net/trip-data/yellow_tripdata_2024-01.parquet"
+    file: "data/raw/yellow_tripdata_2024-01.parquet"
+  zones:
+    url: "https://d37ci6vzurychx.cloudfront.net/misc/taxi_zone_lookup.csv"
+    file: "data/raw/taxi_zone_lookup.csv"
+
+paths:
+  warehouse: "warehouse/trips.duckdb"
+
+cleaning:
+  required_columns:
+    - tpep_pickup_datetime
+    - tpep_dropoff_datetime
+    - passenger_count
+    - trip_distance
+    - fare_amount
+    - tip_amount
+    - payment_type
+    - PULocationID
+    - DOLocationID
+  pickup_date:
+    start: "2024-01-01"
+    end: "2024-02-01"          # half-open window: [start, end)
+  duration_minutes:
+    min: 1
+    max: 1440
+  fare_amount:
+    min: 0.0
+    max: 300.0
+  trip_distance:
+    min: 0.0
+    max: 100.0
+  passenger_count:
+    min: 1
+    max: 9
+  payment_type:
+    min: 1
+    max: 6
